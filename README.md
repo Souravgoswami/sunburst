@@ -1,11 +1,10 @@
 # Sunburst
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sunburst`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Sunburst lets you run a command for a given time.
+When the time expires, the program will be SIGKILLed.
+Sunburst will then report the total CPU time and last known memory usage
+of the program.
 
 ## Installation
-
 Add this line to your application's Gemfile:
 
 ```ruby
@@ -14,30 +13,35 @@ gem 'sunburst'
 
 And then execute:
 
-    $ bundle install
+```
+$ bundle install
+```
 
 Or install it yourself as:
-
-    $ gem install sunburst
+```
+$ gem install sunburst
+```
 
 ## Usage
+Run sunbust -h for instruction.
 
-TODO: Write usage instructions here
+```
+Arguments:
+    --time=N          Run the program for N seconds
+    -h | --help       Show this help section
+    --humanize        Human readable memory units
 
-## Development
+Example:
+    sunburst echo hello world --time=0.05 --humanize
+    sunburst "echo hello world" --time=0.05 --humanize
+    sunburst "ruby -e 'while true do end'" --time=3 --humanize
+    sunburst "ruby -e 'p :Hello'" --time=3 --humanize
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+If no time is specified, it will run until the command exits.
 
 ## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/sunburst. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/sunburst/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/Souravgoswami/sunburst.
 
 ## License
-
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Sunburst project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/sunburst/blob/master/CODE_OF_CONDUCT.md).
