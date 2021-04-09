@@ -13,20 +13,17 @@ module Sunburst
 	def self.measure(command:, time: nil, sleep_time: 0.001)
 		r = {
 			execution_time: nil, cpu_time: nil,
-			memory: nil, processor: nil, max_threads: nil
+			memory: nil, max_threads: nil
 		}
 
 		IO.popen(command) { |x|
 			time1 = Sunburst.clock_monotonic
 			pid = x.pid
 
-			t = Thread.new {
-				print x.readpartial(4096) until x.eof?
-			}
+			t = Thread.new { print x.readpartial(4096) until x.eof? }
 
 			last_mem = 0
 			max_threads = 0
-			processor = 0
 
 			while true
 				_last_mem = Sunburst.get_mem(pid)
@@ -36,10 +33,8 @@ module Sunburst
 
 				# Get stats
 				stats = get_stats(pid)
-
 				_threads = stats[3]
 				max_threads = _threads if max_threads < _threads
-				processor = stats[4]
 
 				sleep(sleep_time)
 			end
@@ -52,7 +47,6 @@ module Sunburst
 
 			_threads = stats[3]
 			max_threads = _threads if max_threads < _threads
-			processor = stats[4]
 
 			# Get Memory Usage
 			_last_mem = Sunburst.get_mem(pid)
@@ -61,10 +55,8 @@ module Sunburst
 			t.kill
 			Process.kill(9, pid)
 
-			# cpu_time, threads, max_threads, last_processor, memory
 			r[:cpu_time] = cpu_time
 			r[:max_threads] = max_threads unless max_threads == 0
-			r[:processor] = processor
 			r[:memory] = last_mem * Sunburst::PAGESIZE if last_mem > 0
 
 			r[:execution_time] = time2.-(time1).truncate(5)

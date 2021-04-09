@@ -6,7 +6,7 @@
 unsigned int PAGESIZE ;
 unsigned int TICKS ;
 
-VALUE statm_memory(VALUE obj, VALUE pid) {
+VALUE statm_memory(volatile VALUE obj, volatile VALUE pid) {
 	int _pid = FIX2INT(pid) ;
 	if (_pid < 0) return Qnil ;
 
@@ -26,7 +26,7 @@ VALUE statm_memory(VALUE obj, VALUE pid) {
 	return UINT2NUM(v) ;
 }
 
-VALUE ps_stat(VALUE obj, VALUE pid) {
+VALUE ps_stat(volatile VALUE obj, volatile VALUE pid) {
 	int _pid = FIX2INT(pid) ;
 	if (_pid < 0) return rb_str_new_cstr("") ;
 
@@ -37,7 +37,7 @@ VALUE ps_stat(VALUE obj, VALUE pid) {
 
 	if (!f) return rb_ary_new() ;
 
-	// For this struct,
+	// For this info
 	// follow https://man7.org/linux/man-pages/man5/proc.5.html
 	int ppid, processor ;
 	long unsigned utime, stime ;
@@ -47,26 +47,23 @@ VALUE ps_stat(VALUE obj, VALUE pid) {
 		f, "%*llu (%*[^)]%*[)] %*c "
 		"%d %*d %*d %*d %*d %*u "
 		"%*lu %*lu %*lu %*lu %lu %lu "
-		"%*ld %*ld %*ld %*ld %ld %*ld "
-		"%*llu %*lu %*ld %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu "
-		"%*d %d",
-		&ppid, &utime, &stime, &num_threads, &processor
+		"%*ld %*ld %*ld %*ld %ld",
+		&ppid, &utime, &stime, &num_threads
 	) ;
 
 	fclose(f) ;
 
-	if (status != 5) return rb_ary_new() ;
+	if (status != 4) return rb_ary_new() ;
 
-	return rb_ary_new_from_args(5,
+	return rb_ary_new_from_args(4,
 		INT2NUM(ppid),
 		ULONG2NUM(utime),
 		ULONG2NUM(stime),
-		LONG2NUM(num_threads),
-		INT2NUM(processor)
+		LONG2NUM(num_threads)
 	) ;
 }
 
-VALUE clock_monotonic(VALUE obj) {
+VALUE clock_monotonic(volatile VALUE obj) {
 	struct timespec tv ;
 	clock_gettime(CLOCK_MONOTONIC, &tv) ;
 	long double time = tv.tv_sec + tv.tv_nsec / 1000000000.0 ;
@@ -74,7 +71,7 @@ VALUE clock_monotonic(VALUE obj) {
 	return rb_float_new(time) ;
 }
 
-VALUE winWidth(VALUE obj) {
+VALUE winWidth(volatile VALUE obj) {
 	struct winsize w ;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) ;
 	return INT2NUM(w.ws_col) ;

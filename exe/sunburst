@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-
-require 'sunburst'
+$-v = nil
 STDOUT.sync = STDIN.sync = true
+require 'sunburst'
 
 def help
 	puts <<~EOF
@@ -75,9 +75,6 @@ begin
 	end
 
 	max_threads = data[:max_threads]
-	processor = data[:processor]
-
-	puts ":: Last Executed CPU: #{processor}"
 	puts ":: Max Threads: #{max_threads}"
 
 rescue Errno::ENOENT
