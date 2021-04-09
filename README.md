@@ -4,6 +4,33 @@ When the time expires, the program will be SIGKILLed.
 Sunburst will then report the total CPU time and last known memory usage
 of the program.
 
+For example:
+
+```
+$ sunburst "while : ; do echo hi ; sleep 1 ; done" --time=3
+:: Running "while : ; do echo hi ; sleep 1 ; done" for 3.0 seconds
+--------------------------------------------------------------------------------
+hi
+hi
+hi
+--------------------------------------------------------------------------------
+:: Total Execution Time: 3.00001 seconds
+:: CPU Time: 0.0 seconds
+:: Memory usage: 573440 bytes
+```
+
+Or
+
+```
+$ sunburst "while : ; do : ; done" --time=3
+:: Running "while : ; do : ; done" for 3.0 seconds
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+:: Total Execution Time: 3.0004 seconds
+:: CPU Time: 2.99 seconds
+:: Memory usage: 356352 bytes
+```
+
 ## Installation
 Add this line to your application's Gemfile:
 
