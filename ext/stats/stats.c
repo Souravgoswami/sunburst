@@ -66,7 +66,7 @@ VALUE ps_stat(volatile VALUE obj, volatile VALUE pid) {
 VALUE clock_monotonic(volatile VALUE obj) {
 	struct timespec tv ;
 	clock_gettime(CLOCK_MONOTONIC, &tv) ;
-	long double time = tv.tv_sec + tv.tv_nsec / 1000000000.0 ;
+	float time = tv.tv_sec + tv.tv_nsec / 1000000000.0 ;
 
 	return rb_float_new(time) ;
 }
