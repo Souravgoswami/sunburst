@@ -1,6 +1,20 @@
 module Sunburst
+	def self.get_stats(pid)
+		stats = Sunburst.ps_stat(pid)
+
+		if stats.empty?
+			Process.kill(9, pid)
+			fail RuntimeError, 'Something horribly wrong! Exiting.'
+		end
+
+		stats
+	end
+
 	def self.measure(command:, time: nil, sleep_time: 0.001)
-		r = {execution_time: nil, cpu_time: nil, memory: nil}
+		r = {
+			execution_time: nil, cpu_time: nil,
+			memory: nil, processor: nil, max_threads: nil
+		}
 
 		IO.popen(command) { |x|
 			time1 = Sunburst.clock_monotonic
@@ -11,6 +25,8 @@ module Sunburst
 			}
 
 			last_mem = 0
+			max_threads = 0
+			processor = 0
 
 			while true
 				_last_mem = Sunburst.get_mem(pid)
@@ -18,13 +34,25 @@ module Sunburst
 				break if (time && Sunburst.clock_monotonic - time1 > time) || _last_mem == 0
 				last_mem = _last_mem
 
+				# Get stats
+				stats = get_stats(pid)
+
+				_threads = stats[3]
+				max_threads = _threads if max_threads < _threads
+				processor = stats[4]
+
 				sleep(sleep_time)
 			end
 
 			time2 = Sunburst.clock_monotonic
 
-			# Get CPU Time
-			cpu_time = Sunburst.get_times(pid).truncate(5)
+			# Get Stats
+			stats = get_stats(pid)
+			cpu_time = stats[1].+(stats[2]).fdiv(Sunburst::TICKS)
+
+			_threads = stats[3]
+			max_threads = _threads if max_threads < _threads
+			processor = stats[4]
 
 			# Get Memory Usage
 			_last_mem = Sunburst.get_mem(pid)
@@ -33,9 +61,13 @@ module Sunburst
 			t.kill
 			Process.kill(9, pid)
 
-			r[:execution_time] = time2.-(time1).truncate(5)
+			# cpu_time, threads, max_threads, last_processor, memory
 			r[:cpu_time] = cpu_time
+			r[:max_threads] = max_threads unless max_threads == 0
+			r[:processor] = processor
 			r[:memory] = last_mem * Sunburst::PAGESIZE if last_mem > 0
+
+			r[:execution_time] = time2.-(time1).truncate(5)
 		}
 
 		r

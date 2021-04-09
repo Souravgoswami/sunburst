@@ -26,25 +26,44 @@ VALUE statm_memory(VALUE obj, VALUE pid) {
 	return UINT2NUM(v) ;
 }
 
-VALUE ps_times(VALUE obj, VALUE pid) {
+VALUE ps_stat(VALUE obj, VALUE pid) {
 	int _pid = FIX2INT(pid) ;
-	if (_pid < 0) return Qnil ;
+	if (_pid < 0) return rb_str_new_cstr("") ;
 
 	char _path[22] ;
 	sprintf(_path, "/proc/%d/stat", _pid) ;
 
 	FILE *f = fopen(_path, "r") ;
-	if (!f) return Qnil ;
 
-	unsigned long utime, stime ;
+	if (!f) return rb_ary_new() ;
 
-	char status = fscanf(f, "%*llu (%*[^)]%*[)] %*c %*d %*d %*d %*d %*d %*u %*lu %*lu %*lu %*lu %lu %lu", &utime, &stime) ;
+	// For this struct,
+	// follow https://man7.org/linux/man-pages/man5/proc.5.html
+	int ppid, processor ;
+	long unsigned utime, stime ;
+	long num_threads ;
+
+	char status = fscanf(
+		f, "%*llu (%*[^)]%*[)] %*c "
+		"%d %*d %*d %*d %*d %*u "
+		"%*lu %*lu %*lu %*lu %lu %lu "
+		"%*ld %*ld %*ld %*ld %ld %*ld "
+		"%*llu %*lu %*ld %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu %*lu "
+		"%*d %d",
+		&ppid, &utime, &stime, &num_threads, &processor
+	) ;
+
 	fclose(f) ;
 
-	if (status != 2) return Qnil ;
-	float total_time = (utime + stime) / (float)TICKS ;
+	if (status != 5) return rb_ary_new() ;
 
-	return rb_float_new(total_time) ;
+	return rb_ary_new_from_args(5,
+		INT2NUM(ppid),
+		ULONG2NUM(utime),
+		ULONG2NUM(stime),
+		LONG2NUM(num_threads),
+		INT2NUM(processor)
+	) ;
 }
 
 VALUE clock_monotonic(VALUE obj) {
@@ -70,8 +89,8 @@ void Init_stats() {
 	rb_define_const(sunburst, "TICKS", UINT2NUM(TICKS)) ;
 
 	rb_define_module_function(sunburst, "get_mem", statm_memory, 1) ;
-	rb_define_module_function(sunburst, "get_times", ps_times, 1) ;
 	rb_define_module_function(sunburst, "clock_monotonic", clock_monotonic, 0) ;
 
 	rb_define_module_function(sunburst, "win_width", winWidth, 0) ;
+	rb_define_module_function(sunburst, "ps_stat", ps_stat, 1) ;
 }

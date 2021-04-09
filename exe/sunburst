@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'sunburst'
 STDOUT.sync = STDIN.sync = true
 
@@ -50,7 +52,6 @@ begin
 	puts ":: CPU Time: #{data[:cpu_time]} second#{?s if data[:cpu_time] != 1}"
 
 	mem = data[:memory]
-
 	if mem
 		if human_readable
 			mem_text = if mem >= 10 ** 12
@@ -72,6 +73,13 @@ begin
 	else
 		puts ":: The memory usage can't be logged."
 	end
+
+	max_threads = data[:max_threads]
+	processor = data[:processor]
+
+	puts ":: Last Executed CPU: #{processor}"
+	puts ":: Max Threads: #{max_threads}"
+
 rescue Errno::ENOENT
 	puts "sunburst: #{command}: command not found"
 	puts ?- * Sunburst.win_width
