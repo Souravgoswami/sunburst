@@ -76,7 +76,7 @@ begin
 	end
 
 	puts ":: Total Execution Time: #{data[:execution_time]} seconds\e[0m"
-	puts ":: CPU Time: #{style}#{data[:cpu_time]}\e[0m second#{?s if data[:cpu_time] != 1}"
+	puts ":: CPU Time: #{style}#{data[:cpu_time]}\e[0m second#{?s if data[:cpu_time] != 1} (#{percent_time.round(3)}% exec time)"
 
 	mem = data[:memory]
 	if mem
@@ -106,9 +106,9 @@ begin
 				"#{mem} Bytes"
 			end
 
-			puts ":: Memory usage: #{style}#{mem_text}\e[0m"
+			puts ":: Memory usage: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
 		else
-			puts ":: Memory usage: #{style}#{mem} bytes\e[0m"
+			puts ":: Memory usage: #{style}#{mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
 		end
 	else
 		puts ":: The memory usage can't be logged."
