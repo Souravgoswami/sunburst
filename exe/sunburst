@@ -24,7 +24,9 @@ def help
 		\s\s\s\ssunburst echo hello world --time=0.05 --humanize
 		\s\s\s\ssunburst "echo hello world" --time=0.05 --humanize
 		\s\s\s\ssunburst "ruby -e 'while true do end'" --time=3 --humanize
-		\s\s\s\ssunburst "ruby -e 'p :Hello'" --time=3 --humanize
+		\s\s\s\ssunburst "ruby -e 'p :Hello'" --time=3
+		\s\s\s\ssunburst "while : ; do : ; done" --time=3 --humanize --progress
+
 	EOF
 
 	exit 0

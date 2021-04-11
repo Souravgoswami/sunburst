@@ -60,13 +60,15 @@ Run sunbust -h for instruction.
 Arguments:
     --time=N          Run the program for N seconds
     -h | --help       Show this help section
+    -p | --progress   Show realtime stats of the process
     --humanize        Human readable memory units
 
 Example:
     sunburst echo hello world --time=0.05 --humanize
     sunburst "echo hello world" --time=0.05 --humanize
     sunburst "ruby -e 'while true do end'" --time=3 --humanize
-    sunburst "ruby -e 'p :Hello'" --time=3 --humanize
+    sunburst "ruby -e 'p :Hello'" --time=3
+    sunburst "while : ; do : ; done" --time=3 --humanize --progress
 ```
 
 If no time is specified, it will run until the command exits.
