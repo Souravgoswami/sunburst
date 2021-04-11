@@ -14,7 +14,7 @@ module Sunburst
 		r = {
 			execution_time: nil, cpu_time: nil,
 			memory: nil, max_threads: nil,
-			max_memory: nil
+			max_memory: nil, state: nil, last_state: nil
 		}
 
 		IO.popen(command) { |x|
@@ -26,6 +26,7 @@ module Sunburst
 			last_mem = 0
 			max_threads = 0
 			max_mem = 0
+			last_state = nil
 
 			while true
 				_last_mem = Sunburst.get_mem(pid)
@@ -38,6 +39,7 @@ module Sunburst
 				stats = get_stats(pid)
 				_threads = stats[3]
 				max_threads = _threads if max_threads < _threads
+				last_state = stats[4]
 
 				sleep(sleep_time)
 			end
@@ -51,10 +53,11 @@ module Sunburst
 			_threads = stats[3]
 			max_threads = _threads if max_threads < _threads
 
-			# Get Memory Usage
 			_last_mem = Sunburst.get_mem(pid)
 			max_mem = _last_mem if max_mem < _last_mem
 			last_mem = _last_mem unless _last_mem == 0
+
+			state = stats[4]
 
 			t.kill
 			Process.kill(9, pid)
@@ -65,6 +68,8 @@ module Sunburst
 			r[:max_memory] = max_mem * Sunburst::PAGESIZE if last_mem > 0
 
 			r[:execution_time] = time2.-(time1).truncate(5)
+			r[:state] = state
+			r[:last_state] = last_state
 		}
 
 		r
