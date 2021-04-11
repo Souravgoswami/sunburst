@@ -53,8 +53,6 @@ VALUE ps_stat(volatile VALUE obj, volatile VALUE pid) {
 		&state, &ppid, &utime, &stime, &num_threads
 	) ;
 
-	printf("-- %s -- ", state) ;
-
 	fclose(f) ;
 
 	if (status != 5) return rb_ary_new() ;
