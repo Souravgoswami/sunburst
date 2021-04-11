@@ -4,7 +4,7 @@ module Sunburst
 
 		if stats.empty?
 			Process.kill(9, pid)
-			fail RuntimeError, 'Something horribly wrong! Exiting.'
+			fail RuntimeError, 'Something horribly wrong happened! Exiting.'
 		end
 
 		stats
