@@ -11,6 +11,8 @@ module Sunburst
 	end
 
 	def self.measure(command:, time: nil, sleep_time: 0.001)
+		progress = block_given?
+
 		r = {
 			execution_time: nil, cpu_time: nil,
 			memory: nil, max_threads: nil,
@@ -21,7 +23,11 @@ module Sunburst
 			time1 = Sunburst.clock_monotonic
 			pid = x.pid
 
-			t = Thread.new { print x.readpartial(4096) until x.eof? }
+			t = if progress
+				Thread.new { }
+			else
+				Thread.new { print x.readpartial(4096) until x.eof? }
+			end
 
 			last_mem = 0
 			max_threads = 0
@@ -41,7 +47,18 @@ module Sunburst
 				max_threads = _threads if max_threads < _threads
 				last_state = stats[4]
 
+				cpu_time = stats[1].+(stats[2]).fdiv(Sunburst::TICKS)
+
 				sleep(sleep_time)
+
+				if progress
+					yield(
+						Sunburst.clock_monotonic.-(time1),
+						stats[1].+(stats[2]).fdiv(Sunburst::TICKS),
+						_last_mem * Sunburst::PAGESIZE,
+						_threads
+					)
+				end
 			end
 
 			time2 = Sunburst.clock_monotonic
