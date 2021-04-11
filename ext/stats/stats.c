@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/ioctl.h>
+#include <sys/sysinfo.h>
 
 unsigned int PAGESIZE ;
 unsigned int TICKS ;
@@ -77,6 +78,20 @@ VALUE winWidth(volatile VALUE obj) {
 	return INT2NUM(w.ws_col) ;
 }
 
+VALUE totalRAM(volatile VALUE obj) {
+	struct sysinfo buf ;
+	char status = sysinfo(&buf) ;
+
+	if (status != 0) return Qnil ;
+
+	return rb_funcall(
+		ULONG2NUM(buf.totalram),
+		rb_intern("*"),
+		1,
+		ULONG2NUM(buf.mem_unit)
+	) ;
+}
+
 void Init_stats() {
 	PAGESIZE = sysconf(_SC_PAGESIZE) ;
 	TICKS = sysconf(_SC_CLK_TCK) ;
@@ -90,4 +105,6 @@ void Init_stats() {
 
 	rb_define_module_function(sunburst, "win_width", winWidth, 0) ;
 	rb_define_module_function(sunburst, "ps_stat", ps_stat, 1) ;
+
+	rb_define_module_function(sunburst, "total_ram", totalRAM, 0) ;
 }
