@@ -9,14 +9,16 @@ For example:
 ```
 $ sunburst "while : ; do echo hi ; sleep 1 ; done" --time=3
 :: Running "while : ; do echo hi ; sleep 1 ; done" for 3.0 seconds
---------------------------------------------------------------------------------
+                     Logging Standard Output and Error
 hi
 hi
 hi
---------------------------------------------------------------------------------
-:: Total Execution Time: 3.00001 seconds
-:: CPU Time: 0.0 seconds
-:: Memory usage: 573440 bytes
+
+    ----------------------------------------------------------------------
+:: Total Execution Time: 3.00097 seconds
+:: CPU Time: 0.0 seconds (0.0% exec time)
+:: Memory usage: 577536 bytes (0.007% system mem)
+:: Max Threads: 1
 ```
 
 Or
@@ -24,11 +26,13 @@ Or
 ```
 $ sunburst "while : ; do : ; done" --time=3
 :: Running "while : ; do : ; done" for 3.0 seconds
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-:: Total Execution Time: 3.0004 seconds
-:: CPU Time: 2.99 seconds
-:: Memory usage: 356352 bytes
+                     Logging Standard Output and Error
+
+    ----------------------------------------------------------------------
+:: Total Execution Time: 3.00097 seconds
+:: CPU Time: 2.97 seconds (98.968% exec time)
+:: Memory usage: 360448 bytes (0.004% system mem)
+:: Max Threads: 1
 ```
 
 ## Installation
