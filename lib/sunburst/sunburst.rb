@@ -56,7 +56,8 @@ module Sunburst
 						Sunburst.clock_monotonic.-(time1),
 						stats[1].+(stats[2]).fdiv(Sunburst::TICKS),
 						_last_mem * Sunburst::PAGESIZE,
-						_threads
+						_threads,
+						last_state
 					)
 				end
 			end
