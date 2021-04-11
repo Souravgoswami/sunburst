@@ -15,6 +15,7 @@ def help
 		Arguments:
 		\s\s\s\s--time=N\s\s\s\s\s\s\s\s\s\sRun the program for N seconds
 		\s\s\s\s-h | --help\s\s\s\s\s\s\sShow this help section
+		\s\s\s\s-p | --progress\s\s\sShow realtime stats of the process
 		\s\s\s\s--humanize\s\s\s\s\s\s\s\sHuman readable memory units
 
 		Example:
@@ -32,6 +33,20 @@ def splitter(sub = 8)
 	puts ?\n, ?-.*(width - sub).center(width)
 end
 
+def convert_bytes(mem)
+	if mem >= 10 ** 12
+		"#{"%06.3f" % mem.fdiv(10 ** 12)} TB"
+	elsif mem >= 10 ** 9
+		"#{"%06.3f" % mem.fdiv(10 ** 9)} GB"
+	elsif mem >= 10 ** 6
+		"#{"%06.3f" % mem.fdiv(10 ** 6)} MB"
+	elsif mem >= 10 ** 3
+		"#{"%06.3f" % mem.fdiv(10 ** 3)} KB"
+	else
+		"#{"%06.3f" % mem} Bytes"
+	end
+end
+
 help if ARGV.any? { |x| x[/^\-(\-help|h)$/] }
 
 time_arg = ARGV.find { |x| x[/^\-\-time=[0-9]+\.?[0-9]*$/] }
@@ -42,20 +57,47 @@ _human_readable = ARGV.find { |x| x[/^\-\-humanize$/] }
 ARGV.delete(_human_readable) if _human_readable
 human_readable = _human_readable
 
+_progress = ARGV.find { |x| x[/^\-(\-progress|p)$/] }
+ARGV.delete(_progress) if _progress
+progress = _progress
+
 command = ARGV.join(' ')
 
 help if command.empty?
 
 puts %Q(:: Running "#{command}" for #{time || 'infinite'} seconds)
 
-
 begin
-	print ""
+	message = if progress
+		"\e[4mLogging Stats, Ignoring Standard Output and Error\e[0m"
+	else
+		"\e[4mLogging Standard Output and Error\e[0m"
+	end
 
-	message = "\e[4mLogging Standard Output and Error\e[0m"
 	puts "\e[38;2;243;156;18m#{message.center(Sunburst.win_width + 6)}\e[0m"
 
-	data = Sunburst.measure(command: command, time: time, sleep_time: 0.0001)
+	data = if progress
+		if human_readable
+			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads|
+				print "\e[2K:: "\
+				"Exec T: #{"%05.2f" % exec_t}s | "\
+				"CPU T: #{"%05.2f" % cpu_t}s | "\
+				"Mem: #{convert_bytes(mem)} | "\
+				"T: #{threads}\r"
+			}
+		else
+			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads|
+				print "\e[2K:: "\
+				"Exec T: #{"%05.2f" % exec_t} | "\
+				"CPU T: #{"%05.2f" % cpu_t} | "\
+				"Mem: #{"%2d" % mem} | "\
+				"T: #{threads}\r"
+			}
+		end
+	else
+		Sunburst.measure(command: command, time: time, sleep_time: 0.0001)
+	end
+
 	print "\e[38;2;243;156;18m"
 	splitter()
 	print "\e[0m"
@@ -94,17 +136,7 @@ begin
 		end
 
 		if human_readable
-			mem_text = if mem >= 10 ** 12
-				"#{mem.fdiv(10 ** 12).round(3)} TB"
-			elsif mem >= 10 ** 9
-				"#{mem.fdiv(10 ** 9).round(3)} GB"
-			elsif mem >= 10 ** 6
-				"#{mem.fdiv(10 ** 6).round(3)} MB"
-			elsif mem >= 10 ** 3
-				"#{mem.fdiv(10 ** 3).round(3)} KB"
-			else
-				"#{mem} Bytes"
-			end
+			mem_text = convert_bytes(mem)
 
 			puts ":: Memory usage During Exit: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
 		else
@@ -130,17 +162,7 @@ begin
 		end
 
 		if human_readable
-			mem_text = if max_mem >= 10 ** 12
-				"#{max_mem.fdiv(10 ** 12).round(3)} TB"
-			elsif max_mem >= 10 ** 9
-				"#{max_mem.fdiv(10 ** 9).round(3)} GB"
-			elsif max_mem >= 10 ** 6
-				"#{max_mem.fdiv(10 ** 6).round(3)} MB"
-			elsif max_mem >= 10 ** 3
-				"#{max_mem.fdiv(10 ** 3).round(3)} KB"
-			else
-				"#{max_mem} Bytes"
-			end
+			mem_text = convert_bytes(max_mem)
 
 			puts ":: Max Memory usage: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
 		else
