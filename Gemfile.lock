@@ -1,0 +1,19 @@
+PATH
+  remote: .
+  specs:
+    sunburst (0.2.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (13.0.3)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  rake (~> 13.0)
+  sunburst!
+
+BUNDLED WITH
+   2.2.15
