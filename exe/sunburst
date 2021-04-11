@@ -76,7 +76,7 @@ begin
 	end
 
 	puts ":: Total Execution Time: #{data[:execution_time]} seconds\e[0m"
-	puts ":: CPU Time: #{style}#{data[:cpu_time]}\e[0m second#{?s if data[:cpu_time] != 1} (#{percent_time.round(3)}% exec time)"
+	puts ":: Total CPU Time: #{style}#{data[:cpu_time]}\e[0m second#{?s if data[:cpu_time] != 1} (#{percent_time.round(3)}% exec time)"
 
 	mem = data[:memory]
 	if mem
@@ -106,12 +106,48 @@ begin
 				"#{mem} Bytes"
 			end
 
-			puts ":: Memory usage: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
+			puts ":: Memory usage During Exit: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
 		else
-			puts ":: Memory usage: #{style}#{mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
+			puts ":: Memory usage During Exit: #{style}#{mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
 		end
 	else
 		puts ":: The memory usage can't be logged."
+	end
+
+	max_mem = data[:max_memory]
+	if max_mem
+		percent_mem = max_mem.*(100).fdiv(Sunburst.total_ram)
+
+		style = "\e[1;"
+		style << if percent_mem > 50
+			"38;2;230;80;70m"
+		elsif percent_mem > 30
+			"38;2;45;125;255m"
+		elsif percent_mem > 10
+			"38;2;255;225;0m"
+		else
+			"38;2;40;175;95m"
+		end
+
+		if human_readable
+			mem_text = if max_mem >= 10 ** 12
+				"#{max_mem.fdiv(10 ** 12).round(3)} TB"
+			elsif max_mem >= 10 ** 9
+				"#{max_mem.fdiv(10 ** 9).round(3)} GB"
+			elsif max_mem >= 10 ** 6
+				"#{max_mem.fdiv(10 ** 6).round(3)} MB"
+			elsif max_mem >= 10 ** 3
+				"#{max_mem.fdiv(10 ** 3).round(3)} KB"
+			else
+				"#{max_mem} Bytes"
+			end
+
+			puts ":: Max Memory usage: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
+		else
+			puts ":: Max Memory usage: #{style}#{max_mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
+		end
+	else
+		puts ":: The max memory usage can't be logged."
 	end
 
 	max_threads = data[:max_threads]
