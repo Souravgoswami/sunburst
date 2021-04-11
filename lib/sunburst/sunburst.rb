@@ -49,8 +49,6 @@ module Sunburst
 
 				cpu_time = stats[1].+(stats[2]).fdiv(Sunburst::TICKS)
 
-				sleep(sleep_time)
-
 				if progress
 					yield(
 						Sunburst.clock_monotonic.-(time1),
@@ -60,6 +58,8 @@ module Sunburst
 						last_state
 					)
 				end
+
+				sleep(sleep_time)
 			end
 
 			time2 = Sunburst.clock_monotonic
