@@ -27,6 +27,11 @@ def help
 	exit 0
 end
 
+def splitter(sub = 8)
+	width = Sunburst.win_width
+	puts ?\n, ?-.*(width - sub).center(width)
+end
+
 help if ARGV.any? { |x| x[/^\-(\-help|h)$/] }
 
 time_arg = ARGV.find { |x| x[/^\-\-time=[0-9]+\.?[0-9]*$/] }
@@ -42,17 +47,52 @@ command = ARGV.join(' ')
 help if command.empty?
 
 puts %Q(:: Running "#{command}" for #{time || 'infinite'} seconds)
-puts ?- * Sunburst.win_width
+
 
 begin
-	data = Sunburst.measure(command: command, time: time, sleep_time: 0.0001)
+	print ""
 
-	puts ?- * Sunburst.win_width
-	puts ":: Total Execution Time: #{data[:execution_time]} seconds"
-	puts ":: CPU Time: #{data[:cpu_time]} second#{?s if data[:cpu_time] != 1}"
+	message = "\e[4mLogging Standard Output and Error\e[0m"
+	puts "\e[38;2;243;156;18m#{message.center(Sunburst.win_width + 6)}\e[0m"
+
+	data = Sunburst.measure(command: command, time: time, sleep_time: 0.0001)
+	print "\e[38;2;243;156;18m"
+	splitter()
+	print "\e[0m"
+
+	exec_time = data[:execution_time]
+	cpu_time = data[:cpu_time]
+	percent_time = cpu_time.*(100).fdiv(exec_time)
+
+	style = "\e[1;"
+	style << if percent_time > 75
+		"38;2;230;80;70m"
+	elsif percent_time > 50
+		"38;2;45;125;255m"
+	elsif percent_time > 25
+		"38;2;255;225;0m"
+	else
+		"38;2;40;175;95m"
+	end
+
+	puts ":: Total Execution Time: #{data[:execution_time]} seconds\e[0m"
+	puts ":: CPU Time: #{style}#{data[:cpu_time]}\e[0m second#{?s if data[:cpu_time] != 1}"
 
 	mem = data[:memory]
 	if mem
+		percent_mem = mem.*(100).fdiv(Sunburst.total_ram)
+
+		style = "\e[1;"
+		style << if percent_mem > 50
+			"38;2;230;80;70m"
+		elsif percent_mem > 30
+			"38;2;45;125;255m"
+		elsif percent_mem > 10
+			"38;2;255;225;0m"
+		else
+			"38;2;40;175;95m"
+		end
+
 		if human_readable
 			mem_text = if mem >= 10 ** 12
 				"#{mem.fdiv(10 ** 12).round(3)} TB"
@@ -66,20 +106,31 @@ begin
 				"#{mem} Bytes"
 			end
 
-			puts ":: Memory usage: #{mem_text}"
+			puts ":: Memory usage: #{style}#{mem_text}\e[0m"
 		else
-			puts ":: Memory usage: #{mem} bytes"
+			puts ":: Memory usage: #{style}#{mem} bytes\e[0m"
 		end
 	else
 		puts ":: The memory usage can't be logged."
 	end
 
 	max_threads = data[:max_threads]
-	puts ":: Max Threads: #{max_threads}"
+	style = "\e[1;"
+	style << if max_threads > 16
+		"38;2;230;80;70m"
+	elsif max_threads > 8
+		"38;2;45;125;255m"
+	elsif max_threads > 4
+		"38;2;255;225;0m"
+	else
+		"38;2;40;175;95m"
+	end
+
+	puts ":: Max Threads: #{style}#{max_threads}\e[0m"
 
 rescue Errno::ENOENT
 	puts "sunburst: #{command}: command not found"
-	puts ?- * Sunburst.win_width
+	puts ?\n, ?- * Sunburst.win_width
 rescue StandardError
-	puts "$!.full_message"
+	puts $!.full_message
 end
