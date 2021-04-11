@@ -40,27 +40,31 @@ VALUE ps_stat(volatile VALUE obj, volatile VALUE pid) {
 
 	// For this info
 	// follow https://man7.org/linux/man-pages/man5/proc.5.html
+	char state[1] ;
 	int ppid, processor ;
 	long unsigned utime, stime ;
 	long num_threads ;
 
 	char status = fscanf(
-		f, "%*llu (%*[^)]%*[)] %*c "
+		f, "%*llu (%*[^)]%*[)] %1s "
 		"%d %*d %*d %*d %*d %*u "
 		"%*lu %*lu %*lu %*lu %lu %lu "
 		"%*ld %*ld %*ld %*ld %ld",
-		&ppid, &utime, &stime, &num_threads
+		&state, &ppid, &utime, &stime, &num_threads
 	) ;
+
+	printf("-- %s -- ", state) ;
 
 	fclose(f) ;
 
-	if (status != 4) return rb_ary_new() ;
+	if (status != 5) return rb_ary_new() ;
 
-	return rb_ary_new_from_args(4,
+	return rb_ary_new_from_args(5,
 		INT2NUM(ppid),
 		ULONG2NUM(utime),
 		ULONG2NUM(stime),
-		LONG2NUM(num_threads)
+		LONG2NUM(num_threads),
+		rb_str_new(state, 1)
 	) ;
 }
 
