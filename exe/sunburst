@@ -110,7 +110,7 @@ begin
 	cpu_time = data[:cpu_time]
 	percent_time = cpu_time.*(100).fdiv(exec_time)
 
-	style = "\e[1;"
+	style = +"\e[1;"
 	style << if percent_time > 75
 		"38;2;230;80;70m"
 	elsif percent_time > 50
@@ -128,7 +128,7 @@ begin
 	if mem
 		percent_mem = mem.*(100).fdiv(Sunburst.total_ram)
 
-		style = "\e[1;"
+		style = +"\e[1;"
 		style << if percent_mem > 50
 			"38;2;230;80;70m"
 		elsif percent_mem > 30
@@ -142,19 +142,19 @@ begin
 		if human_readable
 			mem_text = convert_bytes(mem)
 
-			puts ":: Memory usage During Exit: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
+			puts ":: Memory Usage During Exit: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
 		else
-			puts ":: Memory usage During Exit: #{style}#{mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
+			puts ":: Memory Usage During Exit: #{style}#{mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
 		end
 	else
-		puts ":: The memory usage can't be logged."
+		puts ":: The memory Usage Can't be Logged."
 	end
 
 	max_mem = data[:max_memory]
 	if max_mem
 		percent_mem = max_mem.*(100).fdiv(Sunburst.total_ram)
 
-		style = "\e[1;"
+		style = +"\e[1;"
 		style << if percent_mem > 50
 			"38;2;230;80;70m"
 		elsif percent_mem > 30
@@ -168,16 +168,16 @@ begin
 		if human_readable
 			mem_text = convert_bytes(max_mem)
 
-			puts ":: Max Memory usage: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
+			puts ":: Max Memory Usage: #{style}#{mem_text}\e[0m (#{percent_mem.round(3)}% system mem)"
 		else
-			puts ":: Max Memory usage: #{style}#{max_mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
+			puts ":: Max Memory Usage: #{style}#{max_mem} bytes\e[0m (#{percent_mem.round(3)}% system mem)"
 		end
 	else
-		puts ":: The max memory usage can't be logged."
+		puts ":: The max memory Usage can't be logged."
 	end
 
 	max_threads = data[:max_threads]
-	style = "\e[1;"
+	style = +"\e[1;"
 	style << if max_threads > 16
 		"38;2;230;80;70m"
 	elsif max_threads > 8
