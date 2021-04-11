@@ -14,6 +14,5 @@ Gem::Specification.new do |s|
 	s.executables = s.files.grep(%r{^exe/}) { |f| File.basename(f) }
 	s.extensions = Dir.glob("ext/**/extconf.rb")
 	s.require_paths = ["lib"]
-	s.extra_rdoc_files = Dir.glob(%w(README.md))
 	s.bindir = "exe"
 end
