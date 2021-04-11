@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# Frozen_String_Literal: true
+
 $-v = nil
 STDOUT.sync = STDIN.sync = true
 require 'sunburst'
@@ -78,20 +80,22 @@ begin
 
 	data = if progress
 		if human_readable
-			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads|
+			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state|
 				print "\e[2K:: "\
 				"Exec T: #{"%05.2f" % exec_t}s | "\
 				"CPU T: #{"%05.2f" % cpu_t}s | "\
 				"Mem: #{convert_bytes(mem)} | "\
-				"T: #{threads}\r"
+				"Threads: #{threads} | "\
+				"State: #{state}\r"
 			}
 		else
-			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads|
+			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state|
 				print "\e[2K:: "\
 				"Exec T: #{"%05.2f" % exec_t} | "\
 				"CPU T: #{"%05.2f" % cpu_t} | "\
 				"Mem: #{"%2d" % mem} | "\
-				"T: #{threads}\r"
+				"Threads: #{threads} | "\
+				"State: #{state}\r"
 			}
 		end
 	else
