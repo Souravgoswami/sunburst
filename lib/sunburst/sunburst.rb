@@ -11,11 +11,18 @@ module Sunburst
 	end
 
 	def self.calculate_cpu_usage(pid, sleep_time)
+		uptime_file = '/proc/uptime'.freeze
+
+		unless File.readable?(uptime_file)
+			sleep(sleep_time)
+			return nil
+		end
+
 		ticks = Sunburst::TICKS
 		stat = Sunburst.ps_stat(pid)
 		uptime = IO.read('/proc/uptime').to_f
 
-		unless uptime && !stat.empty?
+		if stat.empty?
 			sleep(sleep_time)
 			return nil
 		end
@@ -30,7 +37,7 @@ module Sunburst
 
 		stat = Sunburst.ps_stat(pid)
 		uptime = IO.read('/proc/uptime').to_f
-		return nil unless uptime && !stat.empty?
+		return nil if stat.empty?
 
 		utime2, stime2, starttime2 = *stat.values_at(1, 2, 5).map(&:to_f)
 		uptime *= ticks
@@ -41,7 +48,7 @@ module Sunburst
 		totald = idle2.+(total_time2).-(idle1 + total_time)
 		cpu_u = totald.-(idle2 - idle1).fdiv(totald).abs.*(100)./(Sunburst.nprocessors)
 
-		cpu_usage = cpu_u > 100 ? 100.0 : cpu_u.round(3)
+		cpu_u > 100 ? 100.0 : cpu_u
 	end
 
 	def self.measure(command:, time: nil, sleep_time: 0.001)

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Frozen_String_Literal: true
 
-$-v = nil
+$-v = true
 STDOUT.sync = STDIN.sync = true
 require 'sunburst'
 
