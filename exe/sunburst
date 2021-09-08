@@ -188,7 +188,11 @@ begin
 	end
 
 	avg_cpu_usage = data[:avg_cpu_usage]
-	puts ":: Avg. CPU Usage: #{style}#{avg_cpu_usage}\e[0m"
+	if avg_cpu_usage
+		puts ":: Avg. CPU Usage: #{style}#{avg_cpu_usage}\e[0m"
+	else
+		puts ":: The Avg. CPU Usage Can't be Logged"
+	end
 
 	max_threads = data[:max_threads]
 	style = +"\e[1;"

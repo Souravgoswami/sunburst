@@ -151,8 +151,7 @@ module Sunburst
 			r[:state] = state
 			r[:last_state] = last_state
 
-			cpu_avg_u = cpu_usage_measure_count > 0 ? cpu_usage_sum / cpu_usage_measure_count : 0
-			r[:avg_cpu_usage] = sprintf "%05.2f%%", cpu_avg_u
+			r[:avg_cpu_usage] = sprintf("%05.2f%%", cpu_usage_sum / cpu_usage_measure_count) if cpu_usage_measure_count > 0
 		}
 
 		r
