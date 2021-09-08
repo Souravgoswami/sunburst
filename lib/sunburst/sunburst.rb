@@ -51,7 +51,7 @@ module Sunburst
 			execution_time: nil, cpu_time: nil,
 			memory: nil, max_threads: nil,
 			avg_mem: nil, max_memory: nil, state: nil, last_state: nil,
-			avg_cpu_usage: nil
+			avg_cpu_usage: nil, max_cpu_usage: nil
 		}
 
 		IO.popen(command) { |x|
@@ -65,6 +65,7 @@ module Sunburst
 			end
 
 			cpu_usage = 0
+			max_cpu_usage = 0
 			cpu_usage_sum = 0
 			cpu_usage_measure_count = 0
 
@@ -76,6 +77,8 @@ module Sunburst
 						cpu_usage = "%05.2f%%".freeze % _cpu_usage
 						cpu_usage_sum += _cpu_usage
 						cpu_usage_measure_count += 1
+
+						max_cpu_usage = _cpu_usage if _cpu_usage > max_cpu_usage
 					else
 						cpu_usage = ?X.freeze
 					end
@@ -152,6 +155,7 @@ module Sunburst
 			r[:last_state] = last_state
 
 			r[:avg_cpu_usage] = sprintf("%05.2f%%", cpu_usage_sum / cpu_usage_measure_count) if cpu_usage_measure_count > 0
+			r[:max_cpu_usage] = sprintf("%05.2f%%", max_cpu_usage) if max_cpu_usage > 0
 		}
 
 		r

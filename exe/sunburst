@@ -194,6 +194,13 @@ begin
 		puts ":: The Avg. CPU Usage Can't be Logged"
 	end
 
+	max_cpu_usage = data[:max_cpu_usage]
+	if max_cpu_usage
+		puts ":: Max CPU Usage: #{style}#{max_cpu_usage}\e[0m"
+	else
+		puts ":: The Max CPU Usage Can't be Logged"
+	end
+
 	max_threads = data[:max_threads]
 	style = +"\e[1;"
 	style << if max_threads > 16
