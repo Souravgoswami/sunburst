@@ -154,6 +154,13 @@ begin
 		puts ":: The memory Usage Can't be Logged."
 	end
 
+	avg_mem = data[:avg_mem]
+	if avg_mem
+		puts ":: Avg. Memory Usage: #{style}#{convert_bytes(avg_mem)}\e[0m (#{percent_mem.round(3)}% system mem)"
+	else
+		puts ":: The Average Memory Usage can't be Logged."
+	end
+
 	max_mem = data[:max_memory]
 	if max_mem
 		percent_mem = max_mem.*(100).fdiv(Sunburst.total_ram)
