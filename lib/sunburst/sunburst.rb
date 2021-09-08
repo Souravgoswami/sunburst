@@ -10,13 +10,47 @@ module Sunburst
 		stats
 	end
 
+	def self.calculate_cpu_usage(pid, sleep_time)
+		ticks = Sunburst::TICKS
+		stat = Sunburst.ps_stat(pid)
+		uptime = IO.read('/proc/uptime').to_f
+
+		unless uptime && !stat.empty?
+			sleep(sleep_time)
+			return nil
+		end
+
+		utime, stime, starttime = *stat.values_at(1, 2, 5).map(&:to_f)
+		uptime *= ticks
+
+		total_time = utime + stime
+		idle1 = uptime - starttime - total_time
+
+		sleep(sleep_time)
+
+		stat = Sunburst.ps_stat(pid)
+		uptime = IO.read('/proc/uptime').to_f
+		return nil unless uptime && !stat.empty?
+
+		utime2, stime2, starttime2 = *stat.values_at(1, 2, 5).map(&:to_f)
+		uptime *= ticks
+
+		total_time2 = utime2 + stime2
+		idle2 = uptime - starttime2 - total_time2
+
+		totald = idle2.+(total_time2).-(idle1 + total_time)
+		cpu_u = totald.-(idle2 - idle1).fdiv(totald).abs.*(100)./(Sunburst.nprocessors)
+
+		cpu_usage = cpu_u > 100 ? 100.0 : cpu_u.round(3)
+	end
+
 	def self.measure(command:, time: nil, sleep_time: 0.001)
 		progress = block_given?
 
 		r = {
 			execution_time: nil, cpu_time: nil,
 			memory: nil, max_threads: nil,
-			max_memory: nil, state: nil, last_state: nil
+			max_memory: nil, state: nil, last_state: nil, avg_cpu_usage: nil
 		}
 
 		IO.popen(command) { |x|
@@ -28,6 +62,25 @@ module Sunburst
 			else
 				Thread.new { print x.readpartial(4096) until x.eof? }
 			end
+
+			cpu_usage = 0
+			cpu_usage_sum = 0
+			cpu_usage_measure_count = 0
+
+			Thread.new {
+				while true
+					_cpu_usage = calculate_cpu_usage(pid, 0.25)
+
+					if _cpu_usage
+						cpu_usage = "%05.2f%%".freeze % _cpu_usage
+						cpu_usage_sum += _cpu_usage
+						cpu_usage_measure_count += 1
+					else
+						cpu_usage = ?X.freeze
+					end
+
+				end
+			}
 
 			last_mem = 0
 			max_threads = 0
@@ -55,7 +108,8 @@ module Sunburst
 						stats[1].+(stats[2]).fdiv(Sunburst::TICKS),
 						_last_mem * Sunburst::PAGESIZE,
 						_threads,
-						last_state
+						last_state,
+						cpu_usage
 					)
 				end
 
@@ -88,6 +142,9 @@ module Sunburst
 			r[:execution_time] = time2.-(time1).truncate(5)
 			r[:state] = state
 			r[:last_state] = last_state
+
+			cpu_avg_u = cpu_usage_measure_count > 0 ? cpu_usage_sum / cpu_usage_measure_count : 0
+			r[:avg_cpu_usage] = sprintf "%05.2f%%", cpu_avg_u
 		}
 
 		r

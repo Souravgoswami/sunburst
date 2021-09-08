@@ -82,13 +82,14 @@ begin
 
 	data = if progress
 		if human_readable
-			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state|
+			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state, cpu_u|
 				print "\e[2K:: "\
 				"Exec T: #{"%05.2f" % exec_t}s | "\
 				"CPU T: #{"%05.2f" % cpu_t}s | "\
 				"Mem: #{convert_bytes(mem)} | "\
 				"Threads: #{threads} | "\
-				"State: #{state}\r"
+				"State: #{state} | "\
+				"CPU U: #{cpu_u}\r"
 			}
 		else
 			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state|
@@ -97,7 +98,8 @@ begin
 				"CPU T: #{"%05.2f" % cpu_t} | "\
 				"Mem: #{"%2d" % mem} | "\
 				"Threads: #{threads} | "\
-				"State: #{state}\r"
+				"State: #{state} | "\
+				"CPU U: #{cpu_u}\r"
 			}
 		end
 	else
@@ -177,6 +179,9 @@ begin
 	else
 		puts ":: The max memory Usage can't be logged."
 	end
+
+	avg_cpu_usage = data[:avg_cpu_usage]
+	puts ":: Avg. CPU Usage: #{style}#{avg_cpu_usage}\e[0m"
 
 	max_threads = data[:max_threads]
 	style = +"\e[1;"

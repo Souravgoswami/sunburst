@@ -44,26 +44,33 @@ VALUE ps_stat(volatile VALUE obj, volatile VALUE pid) {
 	int ppid, processor ;
 	long unsigned utime, stime ;
 	long num_threads ;
+	long long unsigned starttime ;
 
 	char status = fscanf(
 		f, "%*llu (%*[^)]%*[)] %1s "
 		"%d %*d %*d %*d %*d %*u "
 		"%*lu %*lu %*lu %*lu %lu %lu "
-		"%*ld %*ld %*ld %*ld %ld",
-		&state, &ppid, &utime, &stime, &num_threads
+		"%*ld %*ld %*ld %*ld %ld %*ld %ld",
+		&state, &ppid, &utime, &stime, &num_threads, &starttime
 	) ;
 
 	fclose(f) ;
 
-	if (status != 5) return rb_ary_new() ;
+	if (status != 6) return rb_ary_new() ;
 
-	return rb_ary_new_from_args(5,
+	return rb_ary_new_from_args(6,
 		INT2NUM(ppid),
 		ULONG2NUM(utime),
 		ULONG2NUM(stime),
 		LONG2NUM(num_threads),
-		rb_str_new(state, 1)
+		rb_str_new(state, 1),
+		ULL2NUM(starttime)
 	) ;
+}
+
+VALUE nProcessors(volatile VALUE obj) {
+	int coreCount = sysconf(_SC_NPROCESSORS_CONF) ;
+	return (coreCount == -1) ? Qnil : INT2NUM(coreCount) ;
 }
 
 VALUE clock_monotonic(volatile VALUE obj) {
@@ -109,4 +116,5 @@ void Init_stats() {
 	rb_define_module_function(sunburst, "ps_stat", ps_stat, 1) ;
 
 	rb_define_module_function(sunburst, "total_ram", totalRAM, 0) ;
+	rb_define_module_function(sunburst, "nprocessors", nProcessors, 0) ;
 }
