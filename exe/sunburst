@@ -92,7 +92,7 @@ begin
 				"CPU U: #{cpu_u}\r"
 			}
 		else
-			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state|
+			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state, cpu_u|
 				print "\e[2K:: "\
 				"Exec T: #{"%05.2f" % exec_t} | "\
 				"CPU T: #{"%05.2f" % cpu_t} | "\
