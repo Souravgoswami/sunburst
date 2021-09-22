@@ -218,6 +218,8 @@ begin
 rescue Errno::ENOENT
 	puts "sunburst: #{command}: command not found"
 	puts ?\n, ?- * Sunburst.win_width
+rescue Interrupt
+	puts "\n\e[2KInterrupt Received"
 rescue StandardError
 	puts $!.full_message
 end
