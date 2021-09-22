@@ -112,7 +112,7 @@ begin
 
 	exec_time = data[:execution_time]
 	cpu_time = data[:cpu_time]
-	percent_time = cpu_time.*(100).fdiv(exec_time)
+	percent_time = exec_time == 0 ? 0 : cpu_time.*(100).fdiv(exec_time)
 
 	style = +"\e[1;"
 	style << if percent_time > 75
@@ -126,7 +126,9 @@ begin
 	end
 
 	puts ":: Total Execution Time: #{data[:execution_time]} seconds\e[0m"
-	puts ":: Total CPU Time: #{style}#{data[:cpu_time]}\e[0m second#{?s if data[:cpu_time] != 1} (#{percent_time.round(3)}% exec time)"
+
+	percent_time_mesg = exec_time == 0 ? 100 : percent_time
+	puts ":: Total CPU Time: #{style}#{cpu_time}\e[0m second#{?s if cpu_time != 1} (#{"%05.2f" % percent_time_mesg}% exec time)"
 
 	mem = data[:memory]
 	if mem
@@ -156,7 +158,11 @@ begin
 
 	avg_mem = data[:avg_mem]
 	if avg_mem
-		puts ":: Avg. Memory Usage: #{style}#{convert_bytes(avg_mem)}\e[0m (#{percent_mem.round(3)}% system mem)"
+		if human_readable
+			puts ":: Avg. Memory Usage: #{style}#{convert_bytes(avg_mem)}\e[0m (#{percent_mem.round(3)}% system mem)"
+		else
+			puts ":: Avg. Memory Usage: #{style}#{avg_mem}\e[0m (#{percent_mem.round(3)}% system mem)"
+		end
 	else
 		puts ":: The Average Memory Usage can't be Logged."
 	end
