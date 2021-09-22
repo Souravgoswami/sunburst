@@ -83,23 +83,23 @@ begin
 	data = if progress
 		if human_readable
 			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state, cpu_u|
-				print "\e[2K:: "\
+				print "\e[2K\r:: "\
 				"Exec T: #{"%05.2f" % exec_t}s | "\
 				"CPU T: #{"%05.2f" % cpu_t}s | "\
 				"Mem: #{convert_bytes(mem)} | "\
 				"Threads: #{threads} | "\
 				"State: #{state} | "\
-				"CPU U: #{cpu_u}\r"
+				"CPU U: #{cpu_u}\e[s\r\e[u"
 			}
 		else
 			Sunburst.measure(command: command, time: time, sleep_time: 0.0001) { |exec_t, cpu_t, mem, threads, state, cpu_u|
-				print "\e[2K:: "\
+				print "\e[2K\r:: "\
 				"Exec T: #{"%05.2f" % exec_t} | "\
 				"CPU T: #{"%05.2f" % cpu_t} | "\
 				"Mem: #{"%2d" % mem} | "\
 				"Threads: #{threads} | "\
 				"State: #{state} | "\
-				"CPU U: #{cpu_u}\r"
+				"CPU U: #{cpu_u}\e[s\r\e[u"
 			}
 		end
 	else
