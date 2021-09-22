@@ -16,9 +16,12 @@ hi
 
     ------------------------------------------------------------------------
 :: Total Execution Time: 3.00195 seconds
-:: Total CPU Time: 0.0 seconds (0.0% exec time)
+:: Total CPU Time: 0.0 seconds (00.00% exec time)
 :: Memory Usage During Exit: 577536 bytes (0.007% system mem)
+:: Avg. Memory Usage: 476655 (0.007% system mem)
 :: Max Memory Usage: 577536 bytes (0.007% system mem)
+:: Avg. CPU Usage: 00.00%
+:: The Max CPU Usage Can't be Logged
 :: Max Threads: 1
 ```
 
@@ -31,9 +34,12 @@ $ sunburst "while : ; do : ; done" --time=3
 
     ------------------------------------------------------------------------
 :: Total Execution Time: 3.00195 seconds
-:: Total CPU Time: 2.98 seconds (99.269% exec time)
+:: Total CPU Time: 2.99 seconds (99.60% exec time)
 :: Memory Usage During Exit: 356352 bytes (0.004% system mem)
+:: Avg. Memory Usage: 356267 (0.004% system mem)
 :: Max Memory Usage: 356352 bytes (0.004% system mem)
+:: Avg. CPU Usage: 24.91%
+:: Max CPU Usage: 25.00%
 :: Max Threads: 1
 ```
 
@@ -42,13 +48,16 @@ Or Even
 ```
 $ sunburst "while : ; do : ; done" --time=3 --progress --humanize
 :: Running "while : ; do : ; done" for 3.0 seconds
-              Logging Stats, Ignoring Standard Output and Error
-:: Exec T: 03.00s | CPU T: 02.97s | Mem: 356.352 KB | Threads: 1 | State: R
-    ------------------------------------------------------------------------
+                                                                       Logging Stats, Ignoring Standard Output and Error
+:: Exec T: 03.00s | CPU T: 02.82s | Mem: 364.544 KB | Threads: 1 | State: R | CPU U: 25.00%
+    ---------------------------------------------------------------------------------------------------------------------
 :: Total Execution Time: 3.00195 seconds
-:: Total CPU Time: 2.97 seconds (98.936% exec time)
-:: Memory Usage During Exit: 356.352 KB (0.004% system mem)
-:: Max Memory Usage: 356.352 KB (0.004% system mem)
+:: Total CPU Time: 2.82 seconds (93.94% exec time)
+:: Memory Usage During Exit: 364.544 KB (0.004% system mem)
+:: Avg. Memory Usage: 364.304 KB (0.004% system mem)
+:: Max Memory Usage: 364.544 KB (0.004% system mem)
+:: Avg. CPU Usage: 23.55%
+:: Max CPU Usage: 25.00%
 :: Max Threads: 1
 ```
 
